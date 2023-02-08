@@ -20,23 +20,13 @@ object HelloSpark extends Serializable {
 
 val spark = SparkSession.builder().appName(" Hello Spark")
     .master("local[3]").getOrCreate()
-
     val surveyRawDF = loadSurveyDF(spark, "data/sample.csv")
-
     val partitionedSurveyDF = surveyRawDF.repartition(2)
     val countDF = countByCountry(partitionedSurveyDF)
     countDF.foreach(row => {
       logger.info("Country: " + row.getString(0) + " Count: " + row.getLong(1))
     })
-
-   logger.info(countDF.collect().mkString("->"))
-
-    //countDF.show()
-    logger.info("Starting Hello Spark")
-    logger.info("Spark.conf="+ spark.conf.getAll.toString())
-
-
-    logger.info("Finished Hello Spark")
+//  logger.info(countDF.collect().mkString("->"))
     //to hold the spark session, during deve
     scala.io.StdIn.readLine()
     spark.stop()

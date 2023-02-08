@@ -1,7 +1,7 @@
 package examples
 
 import org.apache.log4j.Logger
-import org.apache.spark.sql.{SaveMode, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 import org.apache.spark.sql.functions._
 
 object AggDemo extends Serializable {
@@ -20,10 +20,14 @@ object AggDemo extends Serializable {
       .option("inferSchema", "true")
       .load("data/invoices.csv")
 
-    invoiceDF.select(count("*"),
+    val result = invoiceDF.select(count("*"),
       sum("Quantity"),
-      countDistinct("InvoiceNo")).show()
+      countDistinct("InvoiceNo"))
 
+    result.write.format("json").mode(SaveMode.Overwrite)
+      .option("path","datasink/")
+      .save()
+      result.show()
   }
 
 }

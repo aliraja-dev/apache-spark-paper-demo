@@ -24,11 +24,11 @@ val spark = SparkSession.builder().appName(" Hello Spark").master("local[3]").ge
     val countDF = countByCountry(partitionedSurveyDF)
 
     countDF.write.format("json").mode(SaveMode.Overwrite)
-      .option("path","datasink/")
+      .option("path","datasink/flights")
       .save()
     logger.info("Finished Hello Spark")
     //to hold the spark session, during deve
-   // scala.io.StdIn.readLine()
+  // scala.io.StdIn.readLine()
     spark.stop()
   }
 
