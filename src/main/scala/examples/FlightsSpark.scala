@@ -2,7 +2,7 @@ package examples
 
 import org.apache.log4j.Logger
 import org.apache.spark.SparkConf
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
 
 import java.util.Properties
 import scala.io.Source
@@ -18,16 +18,14 @@ object FlightsSpark extends Serializable {
     }
 
 val spark = SparkSession.builder().appName(" Hello Spark").master("local[3]").getOrCreate()
-    logger.info("Starting Hello Spark")
-    //logger.info("Spark.conf="+ spark.conf.getAll.toString())
-    val surveyRawDF = loadSurveyDF(spark, args(0))
+
+    val surveyRawDF = loadSurveyDF(spark, args(1))
     val partitionedSurveyDF = surveyRawDF.repartition(2)
     val countDF = countByCountry(partitionedSurveyDF)
-    countDF.foreach(row => {
-      logger.info("Country: " + row.getString(0) + " Count: " + row.getLong(1))
-    })
-    logger.info(countDF.collect().mkString("->"))
-    //countDF.show()
+
+    countDF.write.format("json").mode(SaveMode.Overwrite)
+      .option("path","datasink/")
+      .save()
     logger.info("Finished Hello Spark")
     //to hold the spark session, during deve
    // scala.io.StdIn.readLine()
@@ -55,9 +53,6 @@ val spark = SparkSession.builder().appName(" Hello Spark").master("local[3]").ge
     val props = new Properties
     props.load(Source.fromFile("spark.conf").bufferedReader())
     props.forEach((k, v) => sparkAppConf.set(k.toString, v.toString))
-    //This is a fix for Scala 2.11
-   // import scala.collection.JavaConverters._
-   // props.asScala.foreach(kv => sparkAppConf.set(kv._1, kv._2))
     sparkAppConf
   }
 }

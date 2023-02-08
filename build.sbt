@@ -17,8 +17,6 @@ val sparkDependencies = Seq(
   "org.apache.spark" %% "spark-sql" % sparkVersion
 )
 
-val testDependencies = Seq(
-  "org.scalatest" %% "scalatest" % "3.0.8" % Test
-)
 
-libraryDependencies ++= sparkDependencies ++ testDependencies
+
+libraryDependencies ++= sparkDependencies
